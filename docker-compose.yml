@@ -1,0 +1,107 @@
+---
+# All values in ${...} come from the .env file (copy .env.example to .env first).
+services:
+  # image used to index torrent links from the internet
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: arr-suite-prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_ROOT}/prowlarr:/config # location of database and configs
+    ports:
+      - ${PROWLARR_PORT}:9696 # web ui
+    restart: unless-stopped
+
+  # image used to scan for tv shows
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: arr-suite-sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_ROOT}/sonarr:/config # location of database and configs
+      - ${MEDIA_ROOT}:/media # location of media library + qbittorrent download folder
+    ports:
+      - ${SONARR_PORT}:8989 # web ui
+    restart: unless-stopped
+
+  # image used to scan for movies
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: arr-suite-radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_ROOT}/radarr:/config # location of database and configs
+      - ${MEDIA_ROOT}:/media # location of media library + qbittorrent download folder
+    ports:
+      - ${RADARR_PORT}:7878 # web ui
+    restart: unless-stopped
+
+  # image used to manage subtitles
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: arr-suite-bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_ROOT}/bazarr:/config # location of database and configs
+      - ${MEDIA_ROOT}:/media # location of media library
+    ports:
+      - ${BAZARR_PORT}:6767 # web ui
+    restart: unless-stopped
+
+  # image used to bypass cloudflare for prowlarr
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: arr-suite-flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TZ}
+    ports:
+      - ${FLARESOLVERR_PORT}:8191 # api used by prowlarr
+    restart: unless-stopped
+
+  # image used to download stuff
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: arr-suite-qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+    volumes:
+      - ${CONFIG_ROOT}/qbittorrent:/config # location of database and configs
+      - ${MEDIA_ROOT}/downloads:/media/downloads # location of qbittorrent downloads
+    ports:
+      - ${QBITTORRENT_PORT}:8080 # web ui
+      - ${QBITTORRENT_TORRENT_PORT}:6881 # torrent traffic
+      - ${QBITTORRENT_TORRENT_PORT}:6881/udp
+    restart: unless-stopped
+
+  # image used to manage media and stream it
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: arr-suite-jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_ROOT}/jellyfin:/config # location of database and configs; can grow very large
+      - ${MEDIA_ROOT}:/data # location of media library
+    ports:
+      - ${JELLYFIN_PORT}:8096 # web ui
+    restart: unless-stopped
