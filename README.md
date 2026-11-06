@@ -29,20 +29,22 @@ cp .env.example .env
 
 ## 3. Edit `.env`
 
-Open `.env` and set:
+Every setting has a default, so the stack runs even without a `.env` file. Open `.env` and change what you need:
 
-- `PUID` / `PGID` — run `id` and use your `uid` and `gid` (usually `1000`).
-- `TZ` — your timezone, e.g. `Asia/Jerusalem`, `Europe/London`.
-- `CONFIG_ROOT` — where app settings/databases are kept. Default `./configs` (inside this folder) is fine.
-- `MEDIA_ROOT` — your media drive/folder, e.g. `/mnt/media-ssd/media`.
-- Ports — only change if a port is already in use on this machine.
+| Variable | Default | What to set |
+|---|---|---|
+| `PUID` / `PGID` | `1000` | Run `id` and use your `uid` and `gid` |
+| `TZ` | `Etc/UTC` | Your timezone, e.g. `Asia/Jerusalem`, `Europe/London` |
+| `CONFIG_ROOT` | `./configs` | Where app settings/databases are kept. The default (inside this folder) is fine |
+| `MEDIA_ROOT` | `./media` | Your media drive/folder, e.g. `/mnt/media-ssd/media` |
+| `*_PORT` | app defaults (see table above) | Only change if a port is already in use on this machine |
 
 ## 4. Create the media folders
 
 Use the same path you set as `MEDIA_ROOT`:
 
 ```bash
-MEDIA_ROOT=/mnt/media-ssd/media   # <- your path
+MEDIA_ROOT=./media   # <- your path, e.g. /mnt/media-ssd/media
 mkdir -p "$MEDIA_ROOT"/{movies,tv-shows,music,books,downloads}
 sudo chown -R "$(id -u)":"$(id -g)" "$MEDIA_ROOT"
 ```

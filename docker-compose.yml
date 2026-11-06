@@ -1,18 +1,18 @@
 ---
-# All values in ${...} come from the .env file (copy .env.example to .env first).
+# Values in ${VAR:-default} come from the .env file; the default after ":-" is used when unset.
 services:
   # image used to index torrent links from the internet
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: arr-suite-prowlarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
     volumes:
-      - ${CONFIG_ROOT}/prowlarr:/config # location of database and configs
+      - ${CONFIG_ROOT:-./configs}/prowlarr:/config # location of database and configs
     ports:
-      - ${PROWLARR_PORT}:9696 # web ui
+      - ${PROWLARR_PORT:-9696}:9696 # web ui
     restart: unless-stopped
 
   # image used to scan for tv shows
@@ -20,14 +20,14 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: arr-suite-sonarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
     volumes:
-      - ${CONFIG_ROOT}/sonarr:/config # location of database and configs
-      - ${MEDIA_ROOT}:/media # location of media library + qbittorrent download folder
+      - ${CONFIG_ROOT:-./configs}/sonarr:/config # location of database and configs
+      - ${MEDIA_ROOT:-./media}:/media # location of media library + qbittorrent download folder
     ports:
-      - ${SONARR_PORT}:8989 # web ui
+      - ${SONARR_PORT:-8989}:8989 # web ui
     restart: unless-stopped
 
   # image used to scan for movies
@@ -35,14 +35,14 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: arr-suite-radarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
     volumes:
-      - ${CONFIG_ROOT}/radarr:/config # location of database and configs
-      - ${MEDIA_ROOT}:/media # location of media library + qbittorrent download folder
+      - ${CONFIG_ROOT:-./configs}/radarr:/config # location of database and configs
+      - ${MEDIA_ROOT:-./media}:/media # location of media library + qbittorrent download folder
     ports:
-      - ${RADARR_PORT}:7878 # web ui
+      - ${RADARR_PORT:-7878}:7878 # web ui
     restart: unless-stopped
 
   # image used to manage subtitles
@@ -50,14 +50,14 @@ services:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: arr-suite-bazarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
     volumes:
-      - ${CONFIG_ROOT}/bazarr:/config # location of database and configs
-      - ${MEDIA_ROOT}:/media # location of media library
+      - ${CONFIG_ROOT:-./configs}/bazarr:/config # location of database and configs
+      - ${MEDIA_ROOT:-./media}:/media # location of media library
     ports:
-      - ${BAZARR_PORT}:6767 # web ui
+      - ${BAZARR_PORT:-6767}:6767 # web ui
     restart: unless-stopped
 
   # image used to bypass cloudflare for prowlarr
@@ -68,9 +68,9 @@ services:
       - LOG_LEVEL=info
       - LOG_HTML=false
       - CAPTCHA_SOLVER=none
-      - TZ=${TZ}
+      - TZ=${TZ:-Etc/UTC}
     ports:
-      - ${FLARESOLVERR_PORT}:8191 # api used by prowlarr
+      - ${FLARESOLVERR_PORT:-8191}:8191 # api used by prowlarr
     restart: unless-stopped
 
   # image used to download stuff
@@ -78,17 +78,17 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: arr-suite-qbittorrent
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
       - WEBUI_PORT=8080
     volumes:
-      - ${CONFIG_ROOT}/qbittorrent:/config # location of database and configs
-      - ${MEDIA_ROOT}/downloads:/media/downloads # location of qbittorrent downloads
+      - ${CONFIG_ROOT:-./configs}/qbittorrent:/config # location of database and configs
+      - ${MEDIA_ROOT:-./media}/downloads:/media/downloads # location of qbittorrent downloads
     ports:
-      - ${QBITTORRENT_PORT}:8080 # web ui
-      - ${QBITTORRENT_TORRENT_PORT}:6881 # torrent traffic
-      - ${QBITTORRENT_TORRENT_PORT}:6881/udp
+      - ${QBITTORRENT_PORT:-8080}:8080 # web ui
+      - ${QBITTORRENT_TORRENT_PORT:-6881}:6881 # torrent traffic
+      - ${QBITTORRENT_TORRENT_PORT:-6881}:6881/udp
     restart: unless-stopped
 
   # image used to manage media and stream it
@@ -96,12 +96,12 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: arr-suite-jellyfin
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
     volumes:
-      - ${CONFIG_ROOT}/jellyfin:/config # location of database and configs; can grow very large
-      - ${MEDIA_ROOT}:/data # location of media library
+      - ${CONFIG_ROOT:-./configs}/jellyfin:/config # location of database and configs; can grow very large
+      - ${MEDIA_ROOT:-./media}:/data # location of media library
     ports:
-      - ${JELLYFIN_PORT}:8096 # web ui
+      - ${JELLYFIN_PORT:-8096}:8096 # web ui
     restart: unless-stopped
